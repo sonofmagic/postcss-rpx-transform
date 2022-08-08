@@ -15,7 +15,7 @@ export function getConfig (options: UserDefinedOptions) {
   )
 }
 
-export function toFixed (number, precision) {
+export function toFixed (number: number, precision: number) {
   const multiplier = Math.pow(10, precision + 1)
   const wholeNumber = Math.floor(number * multiplier)
   return (Math.round(wholeNumber / 10) * 10) / multiplier
@@ -78,19 +78,45 @@ export function createPropListMatcher (propList) {
   }
 }
 
+export function getTransformDivider (
+  rootValue: number,
+  transformUnit: 'px' | 'rem' | 'vw' | string
+) {
+  switch (transformUnit) {
+    case 'px':
+      return rootValue / 16
+    case 'rem':
+      return rootValue
+    case 'vw':
+      return (rootValue * 7.5) / 32
+    default:
+      throw new Error(`Unknown transform unit: ${transformUnit}`)
+  }
+}
+
 export function createPxReplace (
   rootValue,
   unitPrecision,
   minPixelValue,
   transformUnit = 'px'
-  // onePxTransform
-) {
+): (input) => (m: string, $1: string) => string {
   return function (input) {
     return function (m, $1) {
       if (!$1) return m
       const pixels = parseFloat($1)
       if (pixels < minPixelValue) return m
-      const fixedVal = toFixed(pixels / rootValue(input, m, $1), unitPrecision)
+      let fixedVal
+      if (typeof rootValue === 'function') {
+        fixedVal = toFixed(
+          pixels / getTransformDivider(rootValue(input, m, $1), transformUnit),
+          unitPrecision
+        )
+      } else {
+        fixedVal = toFixed(
+          pixels / getTransformDivider(rootValue, transformUnit),
+          unitPrecision
+        )
+      }
       return fixedVal === 0 ? '0' : fixedVal + transformUnit
     }
   }
