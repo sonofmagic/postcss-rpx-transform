@@ -36,9 +36,23 @@ const config = {
       preferBuiltins: true
     }),
     commonjs(),
-    typescript({ tsconfig: './tsconfig.build.json', sourceMap: isDev })
+    typescript({ tsconfig: './tsconfig.build.json', sourceMap: isDev }),
+    {
+      name: 'postcss7-renamer',
+      renderChunk (code, chunk) {
+        if (chunk.fileName === 'postcss7.js') {
+          return {
+            code: code.replace(/require\('postcss7'\)/g, "require('postcss')")
+          }
+        }
+      }
+    }
   ],
-  external: [...(pkg.dependencies ? Object.keys(pkg.dependencies) : [])]
+  external: [
+    ...(pkg.dependencies
+      ? Object.keys(pkg.dependencies)
+      : ['postcss', 'postcss7'])
+  ]
 }
 
 export default config

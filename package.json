@@ -59,6 +59,7 @@
     "jest": "^28.1.3",
     "postcss": "^8.4.16",
     "postcss-pxtransform": "^3.5.2",
+    "postcss7": "npm:postcss@7.0.39",
     "rollup": "^2.77.2",
     "rollup-plugin-terser": "^7.0.2",
     "ts-jest": "^28.0.7",
