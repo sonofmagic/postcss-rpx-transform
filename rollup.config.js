@@ -10,7 +10,10 @@ const isDev = process.env.NODE_ENV === 'development'
 
 /** @type {import('rollup').RollupOptions} */
 const config = {
-  input: 'src/index.ts',
+  input: {
+    index: 'src/index.ts',
+    postcss7: 'src/postcss7.ts'
+  },
   // { index: 'src/index.ts', cli: 'src/cli.ts' },
   output: [
     {

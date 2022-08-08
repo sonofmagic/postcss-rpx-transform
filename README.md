@@ -1,26 +1,11 @@
-# npm-lib-template
+# postcss-rpx-transform
 
-本人用于编写的一个 `npm` 包的一个模板
+> 反向转化，最为致命!
 
-- 使用 `tsc` 或者 `rollup` 打包
-- 使用 `jest` 设置作为单元测试
-- 使用 `eslint` 来规范代码风格，默认风格为 `standard`
-- 输出 `dist` -> `cjs`,`esm` and `.d.ts`
+`postcss-pxtransform` 的反向版本，用来反向把小程序的 `rpx` 单位，转化为 `px`，`rem`，`vw` 等单位。
 
-## scripts
+let's make rpx great again! LOL
 
-### rename
+## 何时使用
 
-执行 `npm run init:rename`
- 
-作用为替换 `package.json` 中默认包含的所有名称为 `npm-lib-template` 的字段
-
-默认替换为新建代码仓库的文件夹名称！
-
-### bin
-
-执行 `npm run init:bin`
- 
-作用为 `package.json`  添加 `files` 和 `bin`，同时生成 `bin/{{pkg.name}}.js` 和 `src/cli.ts` 文件
-
-
+有些项目，是从小程序为主体的设计稿，来兼容app和h5这类的其他平台的，此时全局更改rpx到其他单位成本比较高，所以需要反向转化
