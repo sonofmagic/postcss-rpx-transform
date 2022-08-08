@@ -4,7 +4,7 @@ import type { PostcssRpxTransform } from '../src/type'
 
 let postcss: Postcss
 let rpxTransform: PostcssRpxTransform
-let pxToRem: any
+
 if (process.env.PostcssVersion === '7') {
   postcss = require('postcss7')
   // ../src/index.postcss7
@@ -14,14 +14,12 @@ if (process.env.PostcssVersion === '7') {
   rpxTransform = require('..')
 }
 
-const basicCSS = '.rule { font-size: 0.9375rem }'
+const basicCSS = '.rule { font-size: 32rpx }'
 
 describe('rpxTransform', function () {
   it('should work on the readme example', function () {
-    const input =
-      'h1 { margin: 0 0 20px; font-size: 2rem; line-height: 1.2; letter-spacing: 0.0625rem; }'
-    const output =
-      'h1 { margin: 0 0 20px; font-size: 32px; line-height: 1.2; letter-spacing: 1px; }'
+    const input = 'h1 { margin: 0 0 20rpx; }'
+    const output = 'h1 { margin: 0 0 10px; }'
     const processed = postcss(rpxTransform()).process(input).css
 
     expect(processed).toBe(output)
@@ -29,7 +27,7 @@ describe('rpxTransform', function () {
 
   it('should replace the rem unit with px', function () {
     const processed = postcss(rpxTransform()).process(basicCSS).css
-    const expected = '.rule { font-size: 15px }'
+    const expected = '.rule { font-size: 16px }'
 
     expect(processed).toBe(expected)
   })
@@ -42,8 +40,8 @@ describe('rpxTransform', function () {
   })
 
   it('should handle < 1 values and values without a leading 0', function () {
-    const rules = '.rule { margin: 0.5px .03125rem -0.0125rem -.2em }'
-    const expected = '.rule { margin: 0.5px 0.5px -0.2px -.2em }'
+    const rules = '.rule { margin: 32rpx .03125rem -0.0125rem -.2em }'
+    const expected = '.rule { margin: 16px .03125rem -0.0125rem -.2em }'
     const options = {
       propList: ['margin']
     }
@@ -53,10 +51,10 @@ describe('rpxTransform', function () {
   })
 
   it('should not add properties that already exist', function () {
-    const expected = '.rule { font-size: 1rem; font-size: 16px; }'
+    const expected = '.rule { font-size: 1rem; font-size: 32rpx; }'
     const processed = postcss(rpxTransform()).process(expected).css
 
-    expect(processed).toBe(expected)
+    expect(processed).toBe('.rule { font-size: 1rem; font-size: 16px; }')
   })
 
   it('should remain unitless if 0', function () {
@@ -68,9 +66,9 @@ describe('rpxTransform', function () {
 
   it('should unit be rpx', function () {
     const input =
-      'h1 { margin: 0 0 20px; font-size: 2rem; line-height: 1.2; letter-spacing: 0.0625rem; }'
+      'h1 { margin: 0 0 20px; font-size: 32rpx; line-height: 1.2; letter-spacing: 4rpx; }'
     const output =
-      'h1 { margin: 0 0 20px; font-size: 32rpx; line-height: 1.2; letter-spacing: 1rpx; }'
+      'h1 { margin: 0 0 20px; font-size: 16px; line-height: 1.2; letter-spacing: 2px; }'
     const processed = postcss(
       rpxTransform({
         transformUnit: 'px'
@@ -87,7 +85,7 @@ describe('value parsing', function () {
       propList: ['*']
     }
     const rules =
-      '.rule { content: \'1rem\'; font-family: "1rem"; font-size: 1rem; }'
+      '.rule { content: \'1rem\'; font-family: "1rem"; font-size: 32rpx; }'
     const expected =
       '.rule { content: \'1rem\'; font-family: "1rem"; font-size: 16px; }'
     const processed = postcss(rpxTransform(options)).process(rules).css
@@ -99,7 +97,7 @@ describe('value parsing', function () {
     const options = {
       propList: ['*']
     }
-    const rules = '.rule { background: url(1rem.jpg); font-size: 1rem; }'
+    const rules = '.rule { background: url(1rem.jpg); font-size: 32rpx; }'
     const expected = '.rule { background: url(1rem.jpg); font-size: 16px; }'
     const processed = postcss(rpxTransform(options)).process(rules).css
 
@@ -111,9 +109,9 @@ describe('value parsing', function () {
       propList: ['*']
     }
     const rules =
-      '.rule { margin: 0.75rem calc(100% - 14REM); height: calc(100% - 1.25rem); font-size: 12Rem; line-height: 1rem; }'
+      '.rule { margin: 0.75rem calc(100% - 14REM); height: calc(100% - 40rpx); font-size: 12Rem; line-height: 32rpx; }'
     const expected =
-      '.rule { margin: 12px calc(100% - 14REM); height: calc(100% - 20px); font-size: 12Rem; line-height: 16px; }'
+      '.rule { margin: 0.75rem calc(100% - 14REM); height: calc(100% - 20px); font-size: 12Rem; line-height: 16px; }'
     const processed = postcss(rpxTransform(options)).process(rules).css
 
     expect(processed).toBe(expected)
@@ -122,7 +120,7 @@ describe('value parsing', function () {
 
 describe('rootValue', function () {
   it('should replace using a root value of 10', function () {
-    const expected = '.rule { font-size: 9.375px }'
+    const expected = '.rule { font-size: 51.2px }'
     const options = {
       rootValue: 10
     }
@@ -134,8 +132,8 @@ describe('rootValue', function () {
 
 describe('unitPrecision', function () {
   it('should replace using a decimal of 2 places', function () {
-    const rules = '.rule { font-size: 0.534375rem }'
-    const expected = '.rule { font-size: 8.55px }'
+    const rules = '.rule { font-size: 0.534375rpx }'
+    const expected = '.rule { font-size: 0.27px }'
     const options = {
       unitPrecision: 2
     }
@@ -150,7 +148,7 @@ describe('propList', function () {
     const rules =
       '.rule { font-size: 1rem; margin: 1rem; margin-left: 0.5rem; padding: 0.5rem; padding-right: 1rem }'
     const expected =
-      '.rule { font-size: 16px; margin: 16px; margin-left: 0.5rem; padding: 0.5rem; padding-right: 16px }'
+      '.rule { font-size: 1rem; margin: 1rem; margin-left: 0.5rem; padding: 0.5rem; padding-right: 1rem }'
     const options = {
       propList: ['*font*', 'margin*', '!margin-left', '*-right', 'pad']
     }
@@ -161,7 +159,7 @@ describe('propList', function () {
 
   it('should only replace properties in the prop list with wildcard', function () {
     const rules =
-      '.rule { font-size: 1rem; margin: 1rem; margin-left: 0.5rem; padding: 0.5rem; padding-right: 1rem }'
+      '.rule { font-size: 1rem; margin: 32rpx; margin-left: 0.5rem; padding: 0.5rem; padding-right: 1rem }'
     const expected =
       '.rule { font-size: 1rem; margin: 16px; margin-left: 0.5rem; padding: 0.5rem; padding-right: 1rem }'
     const options = {
@@ -174,7 +172,7 @@ describe('propList', function () {
 
   it('should replace all properties when white list is wildcard', function () {
     const rules = '.rule { margin: 1rem; font-size: 0.9375rem }'
-    const expected = '.rule { margin: 16px; font-size: 15px }'
+    const expected = '.rule { margin: 1rem; font-size: 0.9375rem }'
     const options = {
       propList: ['*']
     }
@@ -187,7 +185,8 @@ describe('propList', function () {
 describe('selectorBlackList', function () {
   it('should ignore selectors in the selector black list', function () {
     const rules = '.rule { font-size: 0.9375rem } .rule2 { font-size: 15rem }'
-    const expected = '.rule { font-size: 15px } .rule2 { font-size: 15rem }'
+    const expected =
+      '.rule { font-size: 0.9375rem } .rule2 { font-size: 15rem }'
     const options = {
       selectorBlackList: ['.rule2']
     }
@@ -200,7 +199,7 @@ describe('selectorBlackList', function () {
     const rules =
       'body { font-size: 1rem; } .class-body$ { font-size: 16rem; } .simple-class { font-size: 1rem; }'
     const expected =
-      'body { font-size: 16px; } .class-body$ { font-size: 16rem; } .simple-class { font-size: 16px; }'
+      'body { font-size: 1rem; } .class-body$ { font-size: 16rem; } .simple-class { font-size: 1rem; }'
     const options = {
       selectorBlackList: ['body$']
     }
@@ -213,7 +212,7 @@ describe('selectorBlackList', function () {
     const rules =
       'body { font-size: 16rem; } .class-body { font-size: 1rem; } .simple-class { font-size: 1rem; }'
     const expected =
-      'body { font-size: 16rem; } .class-body { font-size: 16px; } .simple-class { font-size: 16px; }'
+      'body { font-size: 16rem; } .class-body { font-size: 1rem; } .simple-class { font-size: 1rem; }'
     const options = {
       selectorBlackList: [/^body$/]
     }
@@ -228,7 +227,7 @@ describe('replace', function () {
     const options = {
       replace: false
     }
-    const expected = '.rule { font-size: 0.9375rem; font-size: 15px }'
+    const expected = '.rule { font-size: 32rpx; font-size: 16px }'
     const processed = postcss(rpxTransform(options)).process(basicCSS).css
 
     expect(processed).toBe(expected)
@@ -237,8 +236,8 @@ describe('replace', function () {
 
 describe('mediaQuery', function () {
   it('should replace rem in media queries', function () {
-    const rules = '@media (min-width: 31.25rem) { .rule { font-size: 1rem } }'
-    const expected = '@media (min-width: 500px) { .rule { font-size: 16px } }'
+    const rules = '@media (min-width: 3200rpx) { .rule { font-size: 32rpx } }'
+    const expected = '@media (min-width: 1600px) { .rule { font-size: 16px } }'
     const options = {
       mediaQuery: true
     }
@@ -251,9 +250,9 @@ describe('mediaQuery', function () {
 describe('minRemValue', function () {
   it('should not replace values below minRemValue', function () {
     const rules =
-      '.rule { border: 0.0625rem solid #000; font-size: 1rem; margin: 0.0625rem 0.625rem; }'
+      '.rule { border: 0.0625rem solid #000; font-size: 32rpx; margin: 0.0625rem 16rpx; }'
     const expected =
-      '.rule { border: 0.0625rem solid #000; font-size: 16px; margin: 0.0625rem 10px; }'
+      '.rule { border: 0.0625rem solid #000; font-size: 16px; margin: 0.0625rem 8px; }'
     const options = {
       propList: ['*'],
       minRemValue: 0.5
@@ -261,17 +260,6 @@ describe('minRemValue', function () {
     const processed = postcss(rpxTransform(options)).process(rules).css
 
     expect(processed).toBe(expected)
-  })
-})
-
-describe('pxToRem', function () {
-  it('should convert from px to rem and back using postcss-pxtorem', function () {
-    const input =
-      'h1 { margin: 0 0 20px 0.5rem; font-size: 13px; line-height: 1.2; letter-spacing: 1px; }'
-    const toRems = postcss(pxToRem()).process(input).css
-    const processed = postcss(rpxTransform()).process(toRems).css
-
-    expect(processed).toBe(input)
   })
 })
 

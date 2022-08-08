@@ -5,7 +5,7 @@ import pkg from './package.json'
 // import json from '@rollup/plugin-json'
 // import replace from '@rollup/plugin-replace'
 // import { terser } from 'rollup-plugin-terser'
-// const isProd = process.env.NODE_ENV === 'production'
+const isProd = process.env.NODE_ENV === 'production'
 const isDev = process.env.NODE_ENV === 'development'
 
 /** @type {import('rollup').RollupOptions} */
@@ -30,16 +30,21 @@ const config = {
     }),
     commonjs(),
     typescript({ tsconfig: './tsconfig.build.json', sourceMap: isDev }),
-    {
-      name: 'postcss7-renamer',
-      renderChunk (code, chunk) {
-        if (chunk.fileName === 'postcss7.js') {
-          return {
-            code: code.replace(/require\('postcss7'\)/g, "require('postcss')")
+    isProd
+      ? {
+          name: 'postcss7-renamer',
+          renderChunk (code, chunk) {
+            if (chunk.fileName === 'postcss7.js') {
+              return {
+                code: code.replace(
+                  /require\('postcss7'\)/g,
+                  "require('postcss')"
+                )
+              }
+            }
           }
         }
-      }
-    }
+      : undefined
   ],
   external: [
     ...(pkg.dependencies
