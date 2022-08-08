@@ -17,18 +17,11 @@ const config = {
   // { index: 'src/index.ts', cli: 'src/cli.ts' },
   output: [
     {
-      file: pkg.main,
+      dir: 'dist',
       format: 'cjs',
       sourcemap: isDev,
       exports: 'auto'
-    },
-    { format: 'esm', file: pkg.module, sourcemap: isDev }
-    // {
-    //   dir: 'dist',
-    //   format: 'cjs',
-    //   sourcemap: isDev,
-    //   exports: 'auto'
-    // },
+    }
   ],
 
   plugins: [

@@ -11,6 +11,7 @@
     "build:tsc": "cross-env NODE_ENV=development tsc --build tsconfig.json",
     "dts": "ttsc --emitDeclarationOnly -p tsconfig.dts.json",
     "test": "jest",
+    "test7": "cross-env PostcssVersion=7 jest",
     "init:rename": "node scripts/init/rename.js",
     "init:bin": "node scripts/init/bin.js",
     "clean": "node scripts/clean.js"

@@ -1,4 +1,5 @@
 import * as filterPropList from './filter-prop-list'
+import type { ChildNode, Container, Input } from 'postcss'
 import type { UserDefinedOptions } from './type'
 import defu from 'defu'
 import { defaultOptions } from './defaults'
@@ -21,21 +22,29 @@ export function toFixed (number: number, precision: number) {
   return (Math.round(wholeNumber / 10) * 10) / multiplier
 }
 
-export function declarationExists (decls, prop, value) {
-  return decls.some(function (decl) {
-    return decl.prop === prop && decl.value === value
-  })
+export function declarationExists (
+  decls: Container<ChildNode>,
+  prop: string,
+  value: string
+) {
+  // @ts-ignore
+  return decls.some((decl) => decl.prop === prop && decl.value === value)
 }
 
-export function blacklistedSelector (blacklist, selector) {
+export function blacklistedSelector (
+  blacklist: (string | RegExp)[],
+  selector?: string
+) {
   if (typeof selector !== 'string') return
-  return blacklist.some(function (regex) {
-    if (typeof regex === 'string') return selector.indexOf(regex) !== -1
+  return blacklist.some((regex) => {
+    if (typeof regex === 'string') {
+      return selector.indexOf(regex) !== -1
+    }
     return selector.match(regex)
   })
 }
 
-export function createPropListMatcher (propList) {
+export function createPropListMatcher (propList: string[]) {
   const hasWild = propList.indexOf('*') > -1
   const matchAll = hasWild && propList.length === 1
   const lists = {
@@ -48,7 +57,7 @@ export function createPropListMatcher (propList) {
     notStartWith: filterPropList.notStartWith(propList),
     notEndWith: filterPropList.notEndWith(propList)
   }
-  return function (prop) {
+  return function (prop: string) {
     if (matchAll) return true
     return (
       (hasWild ||
@@ -95,11 +104,11 @@ export function getTransformDivider (
 }
 
 export function createPxReplace (
-  rootValue,
-  unitPrecision,
-  minPixelValue,
+  rootValue: number | ((input?: Input, m?: string, $1?: string) => number),
+  unitPrecision: number,
+  minPixelValue: number,
   transformUnit = 'px'
-): (input) => (m: string, $1: string) => string {
+): (input?: Input) => (m: string, $1: string) => string {
   return function (input) {
     return function (m, $1) {
       if (!$1) return m

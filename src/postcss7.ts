@@ -1,4 +1,5 @@
 import postcss from 'postcss7'
+import type { Root, Comment, Rule } from 'postcss7'
 import pxRegex from './pixel-unit-regex'
 import type { UserDefinedOptions } from './type'
 import {
@@ -19,20 +20,25 @@ export default postcss.plugin(
 
     const satisfyPropList = createPropListMatcher(opts.propList)
 
-    return function (css) {
+    return function (css: Root) {
       const pxReplace = createPxReplace(
+        // @ts-ignore
         opts.rootValue,
         opts.unitPrecision,
         opts.minValue,
         opts.transformUnit
-      )(css.source.input)
-
-      for (let i = 0; i < css.nodes.length; i++) {
-        if (css.nodes[i].type === 'comment') {
-          if (css.nodes[i].text === 'postcss-rpx-transform disable') {
-            return
-          } else {
-            break
+        // @ts-ignore
+      )(css.source?.input)
+      if (css.nodes) {
+        for (let i = 0; i < css.nodes.length; i++) {
+          if (css.nodes[i].type === 'comment') {
+            if (
+              (<Comment>css.nodes[i]).text === 'postcss-rpx-transform disable'
+            ) {
+              return
+            } else {
+              break
+            }
           }
         }
       }
@@ -43,13 +49,19 @@ export default postcss.plugin(
 
         if (!satisfyPropList(decl.prop)) return
 
-        if (blacklistedSelector(opts.selectorBlackList, decl.parent.selector)) {
+        if (
+          blacklistedSelector(
+            opts.selectorBlackList,
+            (<Rule>decl.parent).selector
+          )
+        ) {
           return
         }
 
         const value = decl.value.replace(pxRgx, pxReplace)
 
         // if rem unit already exists, do not add or replace
+        // @ts-ignore
         if (declarationExists(decl.parent, decl.prop, value)) return
 
         if (opts.replace) {

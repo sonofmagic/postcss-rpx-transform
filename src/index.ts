@@ -42,7 +42,7 @@ const plugin: PostcssRpxTransform = (options: UserDefinedOptions = {}) => {
         opts.unitPrecision,
         opts.minValue,
         opts.transformUnit
-      )(css.source.input)
+      )(css.source?.input)
     },
     Declaration (decl) {
       if (isExcludeFile) return
