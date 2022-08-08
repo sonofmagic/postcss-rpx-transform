@@ -1,7 +1,7 @@
 {
   "name": "postcss-rpx-transform",
   "version": "1.0.0",
-  "description": "postcss-rpx-transform",
+  "description": "let's make rpx great again! convert rpx (responsive-pixel) to px,rem,vw",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "types/index.d.ts",
