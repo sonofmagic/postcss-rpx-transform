@@ -23,6 +23,20 @@ describe('rpxTransform', function () {
     const processed = postcss(rpxTransform()).process(input).css
 
     expect(processed).toBe(output)
+    expect(
+      postcss(
+        rpxTransform({
+          transformUnit: 'rem'
+        })
+      ).process(input).css
+    ).toBe('h1 { margin: 0 0 0.625rem; }')
+    expect(
+      postcss(
+        rpxTransform({
+          transformUnit: 'vw'
+        })
+      ).process(input).css
+    ).toBe('h1 { margin: 0 0 2.66667vw; }')
   })
 
   it('should replace the rem unit with px', function () {
