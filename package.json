@@ -1,9 +1,8 @@
 {
   "name": "postcss-rpx-transform",
-  "version": "1.0.0",
-  "description": "let's make rpx great again! convert rpx (responsive-pixel) to px,rem,vw",
+  "version": "1.0.1",
+  "description": "Let's make rpx great again! convert rpx (responsive-pixel) to px,rem,vw",
   "main": "dist/index.js",
-  "module": "dist/index.es.js",
   "types": "types/index.d.ts",
   "scripts": {
     "dev": "yarn clean && yarn dts && cross-env NODE_ENV=development rollup -cw",
